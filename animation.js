@@ -38,13 +38,14 @@ let image_files = [
 ];
 
 let images = [];
+let bboxes = [];
 
 for (let i = 0; i < image_files.length; i++) {
   let image = svg.add_image(`imgs/${image_files[i]}`, 0, 0, 100, 100);
 
   let x = 100 + i * 250;
   let y = 0 + (Math.random()) * 200;
-  let scale = 2.25;
+  let scale = 1.75 + Math.random() * 1;
 
   let transforms = [
     `translate(${x}, ${y})`,
@@ -52,14 +53,21 @@ for (let i = 0; i < image_files.length; i++) {
   ];
 
   image.attr("transform", transforms.join(","));
-  images.push(image)
+  images.push(image);
+  bboxes.push(svg.draw_bbox(image));
 }
 
 let step = (t) => {
   for (let i in images) {
     let image = images[i];
-    image.attr("y", parseInt(image.attr("y")) + Math.floor(Math.random() * 8));
-    image.attr("x", parseInt(image.attr("x")) + Math.floor(Math.random() * 4));
+    let bbox = bboxes[i];
+    let dx = Math.floor(Math.random() * 4);
+    let dy = Math.floor(Math.random() * 8);
+
+    image.attr("y", parseInt(image.attr("y")) + dy);
+    image.attr("x", parseInt(image.attr("x")) + dx);
+    bbox.attr("y", parseInt(bbox.attr("y")) + dy);
+    bbox.attr("x", parseInt(bbox.attr("x")) + dx);
   }
 
   window.requestAnimationFrame(step);
