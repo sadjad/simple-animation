@@ -13,19 +13,18 @@ class SVGImage {
   }
 
   draw_bbox(element) {
-    let bbox = element.node().getBBox();
-    let ctm = element.node().getCTM();
+    let parent_bbox = this._svg.node().getBoundingClientRect();
+    let bbox = element.node().getBoundingClientRect();
 
     let output = this._svg.append("rect")
-      .attr("x", bbox.x)
-      .attr("y", bbox.y)
+      .attr("x", bbox.x - parent_bbox.x)
+      .attr("y", bbox.y - parent_bbox.y)
       .attr("width", bbox.width)
       .attr("height", bbox.height)
       .attr("fill", "none")
       .attr("stroke", "rgba(0,0,0,0.25)")
       .attr("stroke-dasharray", "2,2");
 
-    output.node().transform.baseVal.initialize(output.node().ownerSVGElement.createSVGTransformFromMatrix(ctm));
     return output;
   }
 }
@@ -61,6 +60,10 @@ let current_frame = 0;
 const max_frames = 250;
 
 let step = (t) => {
+  for (let i in bboxes) {
+    bboxes[i].node().remove();
+  }
+
   for (let i in images) {
     let image = images[i];
     let bbox = bboxes[i];
@@ -69,8 +72,8 @@ let step = (t) => {
 
     image.attr("y", parseInt(image.attr("y")) + dy);
     image.attr("x", parseInt(image.attr("x")) + dx);
-    bbox.attr("y", parseInt(bbox.attr("y")) + dy);
-    bbox.attr("x", parseInt(bbox.attr("x")) + dx);
+    
+    bboxes.push(svg.draw_bbox(image));
   }
 
   current_frame++;
