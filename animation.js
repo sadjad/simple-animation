@@ -57,6 +57,9 @@ for (let i = 0; i < image_files.length; i++) {
   bboxes.push(svg.draw_bbox(image));
 }
 
+let current_frame = 0;
+const max_frames = 250;
+
 let step = (t) => {
   for (let i in images) {
     let image = images[i];
@@ -70,7 +73,9 @@ let step = (t) => {
     bbox.attr("x", parseInt(bbox.attr("x")) + dx);
   }
 
-  window.requestAnimationFrame(step);
+  current_frame++;
+
+  if (current_frame < max_frames) { window.requestAnimationFrame(step); }
 };
 
 window.requestAnimationFrame(step);
