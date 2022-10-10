@@ -16,14 +16,22 @@ class SVGImage {
     let parent_bbox = this._svg.node().getBoundingClientRect();
     let bbox = element.node().getBoundingClientRect();
 
-    let output = this._svg.append("rect")
+    let output = this._svg.append("g");
+
+    output.append("rect")
       .attr("x", bbox.x - parent_bbox.x)
       .attr("y", bbox.y - parent_bbox.y)
       .attr("width", bbox.width)
       .attr("height", bbox.height)
       .attr("fill", "none")
       .attr("stroke", "rgba(0,0,0,0.25)")
-      .attr("stroke-dasharray", "2,2");
+      .attr("stroke-dasharray", "16,8");
+
+    output.append("text")
+      .attr("class", "bbox-label")
+      .attr("x", bbox.x - parent_bbox.x)
+      .attr("y", bbox.y - parent_bbox.y - 10)
+      .text(`(${(bbox.x - parent_bbox.x).toFixed(2)}, ${(bbox.y - parent_bbox.y).toFixed(2)})`);
 
     return output;
   }
@@ -57,12 +65,14 @@ for (let i = 0; i < image_files.length; i++) {
 }
 
 let current_frame = 0;
-const max_frames = 250;
+const max_frames = 100;
 
 let step = (t) => {
   for (let i in bboxes) {
     bboxes[i].node().remove();
   }
+
+  bboxes = [];
 
   for (let i in images) {
     let image = images[i];
@@ -72,13 +82,15 @@ let step = (t) => {
 
     image.attr("y", parseInt(image.attr("y")) + dy);
     image.attr("x", parseInt(image.attr("x")) + dx);
-    
+
     bboxes.push(svg.draw_bbox(image));
   }
 
   current_frame++;
 
-  if (current_frame < max_frames) { window.requestAnimationFrame(step); }
+  if (current_frame < max_frames) {
+    setTimeout(step, 33);
+  }
 };
 
-window.requestAnimationFrame(step);
+step();
