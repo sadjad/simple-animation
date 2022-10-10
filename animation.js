@@ -50,7 +50,7 @@ let bboxes = [];
 for (let i = 0; i < image_files.length; i++) {
   let image = svg.add_image(`imgs/${image_files[i]}`, 0, 0, 100, 100);
 
-  let x = 100 + (Math.floor(Math.random() * 6)) * 250;
+  let x = (i + 1) * 250;
   let y = Math.random() * 1080 / 2;
   let scale = 1.75 + Math.random() * 1;
 
@@ -65,7 +65,7 @@ for (let i = 0; i < image_files.length; i++) {
 }
 
 let current_frame = 0;
-const max_frames = 200;
+const max_frames = 300;
 const interval = 100;
 
 let step = (t) => {
@@ -78,17 +78,22 @@ let step = (t) => {
   for (let i in images) {
     let image = images[i];
 
-    let dx = (2 + i / 3) * Math.sin(4 * Math.PI * Math.pow(current_frame / interval, 1)) * 6;
-    let dy = (2 + i / 3) * Math.cos(4 * Math.PI * Math.pow(current_frame / interval, 1)) * 6;
+    let dx = (2 + i / 3) * Math.sin(4 * Math.PI * Math.pow(1.0 * current_frame / interval, 1)) * 6;
+    let dy = (2 + i / 3) * Math.tan(8 * Math.PI * Math.pow(1.0 * current_frame / interval, 1)) * 6;
+    dy = Math.max(-50, Math.min(dy, 50));
 
     if (i % 3 == 0 || i % 5 == 0) {
       dx = -dx;
     }
 
+    if (i % 4 == 0) {
+      dy = -dy;
+    }
+
     image.attr("y", parseInt(image.attr("y")) + dy);
     image.attr("x", parseInt(image.attr("x")) + dx);
-    // image.attr("width", parseInt(image.attr("width")) + 1);
-    // image.attr("height", parseInt(image.attr("height")) + 1);
+    image.attr("width", parseInt(image.attr("width")) + (Math.sin(32 * Math.PI * current_frame / interval) > 0 ? 5 : -5));
+    image.attr("height", parseInt(image.attr("height")) + (Math.sin(32 * Math.PI * current_frame / interval) > 0 ? 5 : -5));
 
     bboxes.push(svg.draw_bbox(image));
   }
